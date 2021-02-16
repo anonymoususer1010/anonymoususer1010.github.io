@@ -2,9 +2,19 @@
 title: "CORONA Dashboard v1.0"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
+    theme: yeti
+    orientation: rows
     vertical_layout: fill
 ---
+<style>                     
+.navbar {
+  background-color:DarkBlue;
+  border-color:black;
+}
+.navbar-brand {
+color:white!important;
+}
+</style> 
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
@@ -71,7 +81,8 @@ valueBox(cur)
 valueBox(dt)
 ```
 
-## Clolumn {data-width=450}
+Row {.tabset .tabset-fade}
+-------------------------------------
 
 ### CURED STATES
 
@@ -82,7 +93,6 @@ ggplot() +
                color = "black", size = 0.5) +  coord_map()
 ```
 
-## Column {data-width=400}
 
 ### CONFIRMED CASES
 
@@ -99,7 +109,7 @@ ggplot(data = ci, aes(x = states, y = confirmed)) +
 
 ```{r}
 ggplot(data = ci, aes(x = states, y = death)) +
-  geom_bar(stat = "identity", fill = "purple")+coord_flip()+
+  geom_bar(stat = "identity", fill = "red")+coord_flip()+
   labs(x = "States",
        y = "Death",
        title = "Comparing Death cases")

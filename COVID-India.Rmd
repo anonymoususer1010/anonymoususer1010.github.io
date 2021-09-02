@@ -30,7 +30,7 @@ library(rgeos)
 library(mapproj)
 library(dplyr)
 
-ci<-read.csv("coronaIndia.csv")
+ci<-read.csv("My_covid_data.csv")
 
 ci$confirmed<-as.numeric(ci$confirmed)
 ci$cured<-as.numeric(ci$cured)
@@ -40,7 +40,7 @@ conf <- sum(ci[,3])
 cur <-sum(ci[,4])
 dt <-sum(ci[,5])
 
-covidind<-read.csv("coronaIndia.csv")
+covidind<-read.csv("My_covid_data.csv")
 covidind$confirmed<-as.numeric(covidind$confirmed)
 covidind$cured<-as.numeric(covidind$cured)
 covidind$death<-as.numeric(covidind$death)
@@ -58,6 +58,17 @@ State_data = data.frame(id=states_shape$ID_1, NAME_1=states_shape$NAME_1, score)
 fortify_shape = fortify(states_shape, region = "ID_1")
 Merged_data = merge(fortify_shape, State_data, by="id", all.x=TRUE)
 Map_plot = Merged_data[order(Merged_data$order), ]
+
+addUnits <- function(n) {
+  labels <- ifelse(n < 1000, n,  # less than thousands
+                   ifelse(n < 1e6, paste0(round(n/1e3), 'k'),  # in thousands
+                          ifelse(n < 1e9, paste0(round(n/1e6), 'M'),  # in millions
+                                 ifelse(n < 1e12, paste0(round(n/1e9), 'B'), # in billions
+                                        ifelse(n < 1e15, paste0(round(n/1e12), 'T'), # in trillions
+                                               'too big!'
+                                        )))))
+  return(labels)
+}
 ```
 
 
@@ -75,6 +86,12 @@ valueBox(conf)
 valueBox(cur)
 ```
 
+### ACTIVE CASES
+
+```{r}
+valueBox(conf-cur-dt)
+```
+
 ### DEATH CASES
 
 ```{r}
@@ -90,7 +107,8 @@ Row {.tabset .tabset-fade}
 ggplot() +
   geom_polygon(data = Map_plot,
                aes(x = long, y = lat, group = group, fill = score),
-               color = "black", size = 0.5) +  coord_map()
+               color = "black", size = 0.5) +  coord_map() + expand_limits(fill = c(0, NA)) +
+  scale_fill_continuous(labels = addUnits)
 ```
 
 
@@ -102,7 +120,8 @@ ggplot(data = ci, aes(x = states, y = confirmed)) +
   coord_flip()+
     labs(x = "States",
        y = "Confirmed",
-       title = "Comparing Confirmed cases")
+       title = "Comparing Confirmed cases") +expand_limits(x = c(0, NA), y = c(0, NA)) +
+  scale_y_continuous(labels = addUnits) 
 ```
 
 ### DEATH CASES
@@ -112,5 +131,6 @@ ggplot(data = ci, aes(x = states, y = death)) +
   geom_bar(stat = "identity", fill = "red")+coord_flip()+
   labs(x = "States",
        y = "Death",
-       title = "Comparing Death cases")
+       title = "Comparing Death cases") +expand_limits(x = c(0, NA), y = c(0, NA)) +
+  scale_y_continuous(labels = addUnits) 
 ```

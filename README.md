@@ -1,1 +1,1 @@
-# anonymoususer1010.github.io
+A visual dashboard for recent corona stats. Data in visual form is more easily understandable than in numerical format. So visualization of data helps to convey to a large amount of people the meaning of the data at a quick glance.
